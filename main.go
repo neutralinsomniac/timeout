@@ -30,7 +30,7 @@ const (
 )
 
 const (
-	fontPath = "test.ttf"
+	fontPath = "font.ttf"
 	fontSize = 128
 )
 
@@ -38,7 +38,7 @@ func fmtDuration(d time.Duration) string {
 	d = d.Round(time.Second)
 
 	m := d / time.Minute
-	d-= m * time.Minute
+	d -= m * time.Minute
 	s := d / time.Second
 
 	return fmt.Sprintf("%02d:%02d", m, s)
@@ -47,7 +47,6 @@ func fmtDuration(d time.Duration) string {
 var (
 	audioC = make(chan []int16, 1)
 )
-
 
 //export OnAudio
 func OnAudio(userdata unsafe.Pointer, _stream *C.Uint8, _length C.int) {
@@ -114,7 +113,7 @@ func run(dur time.Duration) (err error) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		if int(tmpIndex) > numAudioDevices - 1 {
+		if int(tmpIndex) > numAudioDevices-1 {
 			fmt.Println("index out of range")
 			os.Exit(1)
 		}
@@ -162,7 +161,7 @@ func run(dur time.Duration) (err error) {
 		}
 		select {
 		case audioSamples := <-audioC:
-			for i := range(audioSamples) {
+			for i := range audioSamples {
 				movingAvg.Add(math.Abs(float64(audioSamples[i])))
 			}
 
@@ -172,7 +171,7 @@ func run(dur time.Duration) (err error) {
 			}
 		}
 
-        // fmt.Printf("%f\n", movingAvg.Avg())
+		// fmt.Printf("%f\n", movingAvg.Avg())
 		// Create a red text with the font
 		if text, err = font.RenderUTF8Blended(fmtDuration(remaining), sdl.Color{R: 255, G: 0, B: 0, A: 255}); err != nil {
 			return
