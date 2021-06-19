@@ -111,7 +111,8 @@ func run(dur time.Duration) (err error) {
 		text = strings.TrimSuffix(text, "\n")
 		tmpIndex, err := strconv.ParseInt(text, 10, 32)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			os.Exit(1)
 		}
 		if int(tmpIndex) > numAudioDevices - 1 {
 			fmt.Println("index out of range")
