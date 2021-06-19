@@ -51,9 +51,12 @@ var (
 //export OnAudio
 func OnAudio(userdata unsafe.Pointer, _stream *C.Uint8, _length C.int) {
 	// We need to cast the stream from C uint8 array into Go int16 slice
-	length := int(_length) / 2                                                                      // Divide by 2 because a single int16 consists of two uint8
-	header := reflect.SliceHeader{Data: uintptr(unsafe.Pointer(_stream)), Len: length, Cap: length} // Build the slice header for our int16 slice
-	buf := *(*[]int16)(unsafe.Pointer(&header))                                                     // Use the slice header as int16 slice
+	var buf []int16
+	header := (*reflect.SliceHeader)(unsafe.Pointer(&buf))
+	length := int(_length) / 2 // Divide by 2 because a single int16 consists of two uint8
+	header.Len = length        // Build the slice header for our int16 slice
+	header.Cap = length
+	header.Data = uintptr(unsafe.Pointer(_stream))
 
 	// Copy the audio samples into temporary buffer
 	audioSamples := make([]int16, length)
