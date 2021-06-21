@@ -98,8 +98,7 @@ func run(dur time.Duration) (err error) {
 	numAudioDevices := sdl.GetNumAudioDevices(true)
 	switch numAudioDevices {
 	case 0:
-		fmt.Println("ERROR: no audio devices can capture audio")
-		os.Exit(1)
+		log.Fatal("ERROR: no audio devices can capture audio")
 	case 1:
 		audioDeviceIndex = 0
 	default:
@@ -113,12 +112,10 @@ func run(dur time.Duration) (err error) {
 		text = strings.TrimSuffix(text, "\n")
 		tmpIndex, err := strconv.ParseInt(text, 10, 32)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 		if int(tmpIndex) > numAudioDevices-1 {
-			fmt.Println("index out of range")
-			os.Exit(1)
+			log.Fatal("index out of range")
 		}
 		audioDeviceIndex = int(tmpIndex)
 	}
@@ -138,12 +135,12 @@ func run(dur time.Duration) (err error) {
 	defer window.Destroy()
 
 	if surface, err = window.GetSurface(); err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	// Load the font for our text
 	if font, err = ttf.OpenFont(fontPath, fontSize); err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer font.Close()
 
@@ -207,8 +204,7 @@ func main() {
 
 	dur, err := time.ParseDuration(os.Args[1])
 	if err != nil {
-		fmt.Printf("invalid duration\n")
-		os.Exit(1)
+		log.Fatal("invalid duration\n")
 	}
 
 	if err := run(dur); err != nil {
