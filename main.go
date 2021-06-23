@@ -8,7 +8,7 @@ import "C"
 import (
 	"bufio"
 	"fmt"
-	movingaverage "github.com/RobinUS2/golang-moving-average"
+	. "github.com/mxmCherry/movavg"
 	"log"
 	"math"
 	"os"
@@ -149,7 +149,7 @@ func run(dur time.Duration) (err error) {
 	end := start.Add(dur)
 
 	// Run infinite loop until user closes the window
-	movingAvg := movingaverage.New(4096)
+	sma := ThreadSafe(NewSMA(4096))
 	running := true
 	remaining := end.Sub(start)
 	for running && remaining.Seconds() > 0 {
@@ -162,16 +162,16 @@ func run(dur time.Duration) (err error) {
 		select {
 		case audioSamples := <-audioC:
 			for i := range audioSamples {
-				movingAvg.Add(math.Abs(float64(audioSamples[i])))
+				sma.Add(math.Abs(float64(audioSamples[i])))
 			}
 
 			// tweak this to match your soundcard
-			if movingAvg.Avg() > 1000 {
+			if sma.Avg() > 30000 {
 				end = start.Add(dur)
 			}
 		}
 
-		// fmt.Printf("%f\n", movingAvg.Avg())
+		// fmt.Printf("%f\n", sma.Avg())
 		// Create a red text with the font
 		if text, err = font.RenderUTF8Blended(fmtDuration(remaining), sdl.Color{R: 255, G: 0, B: 0, A: 255}); err != nil {
 			return
